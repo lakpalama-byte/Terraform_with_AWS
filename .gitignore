@@ -1,0 +1,10 @@
+
+
+# Ignore large terraform executable
+terraform_1.9.5_windows_amd64/terraform.exe
+
+# You can also use wildcards to ignore similar files
+*.exe
+
+# Ignore all .exe files in terraform directories
+terraform_*/terraform.exe
