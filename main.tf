@@ -1,5 +1,7 @@
 
- # initiate the provvider
+ # initiate the provvider]
+
+
 
 # create the VPC
 resource "aws_vpc" "production_vpc" {
@@ -142,3 +144,304 @@ tags= {
     route_table_id = aws_route_table.private_rt.id
     
   }
+
+
+
+#Security group
+
+#Create jenkins security groups
+
+resource "aws_security_group" "jenkins_sg" {
+  name        = "Jenkins SG"
+  description = "allow ports 8080 and 22"
+  vpc_id      = aws_vpc.production_vpc.id
+
+  ingress = [
+    {
+      description      = "jenkins"
+      from_port        = var.jenkins_port
+      to_port          = var.jenkins_port
+      protocol         = "tcp"
+      cidr_blocks      = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = []  # Optional: Add if you need to allow IPv6 addresses
+      prefix_list_ids  = []  # Optional: Add if you need to use AWS prefix lists
+      security_groups  = []  # Optional: Add if you need to allow other security groups
+      self             = false  # Optional: Set to true if you need to allow traffic from itself
+    },
+    {
+      description      = "SSH"
+      from_port        = var.SSH_port
+      to_port          = var.SSH_port
+      protocol         = "tcp"
+      cidr_blocks      = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = []  # Optional
+      prefix_list_ids  = []  # Optional
+      security_groups  = []  # Optional
+      self             = false  # Optional
+    }
+  ]
+
+  egress = [
+    {  description = "allow all outbound traffic"
+      from_port        = 0
+      to_port          = 0
+      protocol         = "-1"
+      cidr_blocks      = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = []  # Optional
+      prefix_list_ids  = []  # Optional
+      security_groups  = []  # Optional
+      self             = false  # Optional
+    }
+  ]
+
+  tags = {
+    Name = "Jenkins SG"
+  }
+}
+
+
+# Create the sonarqube security groups
+
+
+
+ resource "aws_security_group" "sonarqube_sg" {
+name        = "sonarqube SG"
+  description = "allow ports 9000 and 22"
+  vpc_id      = aws_vpc.production_vpc.id
+
+  ingress = [
+    {
+      description = "sonarqube"
+      from_port   = var.sonarqube_port
+      to_port     = var.sonarqube_port
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+        ipv6_cidr_blocks = []  # Optional: Add if you need to allow IPv6 addresses
+        prefix_list_ids  = []  # Optional: Add if you need to use AWS prefix lists
+        security_groups  = []  # Optional: Add if you need to allow other security groups
+        self             = false  # Optional: Set to true if you need to allow traffic from itself
+    },
+    {
+      description = "SSH"
+      from_port   = var.SSH_port
+      to_port     = var.SSH_port
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+        ipv6_cidr_blocks = []  # Optional: Add if you need to allow IPv6 addresses
+        prefix_list_ids  = []  # Optional: Add if you need to use AWS prefix lists
+        security_groups  = []  # Optional: Add if you need to allow other security groups
+        self             = false  # Optional: Set to true if you need to allow traffic from itself
+    }
+  ]
+
+  egress = [
+    { description = "allow all outbound traffic"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_blocks = ["0.0.0.0/0"]
+       ipv6_cidr_blocks = []  # Optional: Add if you need to allow IPv6 addresses
+       prefix_list_ids  = []  # Optional: Add if you need to use AWS prefix lists
+       security_groups  = []  # Optional: Add if you need to allow other security groups
+       self             = false  # Optional: Set to true if you need to allow traffic from itself
+    }
+  ]
+
+  tags = {
+    Name = "Sonarqube SG"
+  }
+}
+
+
+#ansible security group
+
+
+resource "aws_security_group" "ansible_sg" {
+  name        = "ansible SG"
+  description = "allow port 22"
+  vpc_id      = aws_vpc.production_vpc.id
+
+  ingress = [
+    {
+      description = "SSH"
+      from_port   = var.SSH_port
+      to_port     = var.SSH_port
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+        ipv6_cidr_blocks = []  # Optional: Add if you need to allow IPv6 addresses
+        prefix_list_ids  = []  # Optional: Add if you need to use AWS prefix lists
+        security_groups  = []  # Optional: Add if you need to allow other security groups
+        self             = false  # Optional: Set to true if you need to allow traffic from itself
+    }
+  ]
+
+  egress = [
+    { description = "allow all outbound traffic"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_blocks = ["0.0.0.0/0"]
+        ipv6_cidr_blocks = []  # Optional: Add if you need to allow IPv6 addresses
+        prefix_list_ids  = []  # Optional: Add if you need to use AWS prefix lists
+        security_groups  = []  # Optional: Add if you need to allow other security groups
+        self             = false  # Optional: Set to true if you need to allow traffic from itself
+    }
+  ]
+
+  tags = {
+    Name = "Ansible SG"
+  }
+}
+
+
+
+#  Graphana Security Group
+
+
+
+resource "aws_security_group" "grafana_sg" {
+  name        = "grafana SG"
+  description = "allow port 3000 and 22"
+  vpc_id      = aws_vpc.production_vpc.id
+
+  ingress = [
+    {
+      description = "Grafana"
+      from_port   = var.grafana_port
+      to_port     = var.grafana_port
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+        ipv6_cidr_blocks = []  # Optional: Add if you need to allow IPv6 addresses
+        prefix_list_ids  = []  # Optional: Add if you need to use AWS prefix lists
+        security_groups  = []  # Optional: Add if you need to allow other security groups
+        self             = false  # Optional: Set to true if you need to allow traffic from itself
+    },
+    {
+      description = "SSH"
+      from_port   = var.SSH_port
+      to_port     = var.SSH_port
+      protocol    = "tcp"
+     cidr_blocks = ["0.0.0.0/0"] 
+        ipv6_cidr_blocks = []  # Optional: Add if you need to allow IPv6 addresses
+        prefix_list_ids  = []  # Optional: Add if you need to use AWS prefix lists
+        security_groups  = []  # Optional: Add if you need to allow other security groups
+        self             = false  # Optional: Set to true if you need to allow traffic from itself
+    }
+   ]
+
+  egress = [
+    { description = "allow all outbound traffic"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_blocks = ["0.0.0.0/0"]
+        ipv6_cidr_blocks = []  # Optional: Add if you need to allow IPv6 addresses
+        prefix_list_ids  = []  # Optional: Add if you need to use AWS prefix lists
+        security_groups  = []  # Optional: Add if you need to allow other security groups
+        self             = false  # Optional: Set to true if you need to allow traffic from itself
+    }
+  ]
+
+  tags = {
+    Name = "Grafana SG"
+  }
+}
+
+
+
+# security group for Application security group
+
+
+
+
+resource "aws_security_group" "application_sg" {
+  name        = "Application SG"
+  description = "allow ports 80 and 22"
+  vpc_id      = aws_vpc.production_vpc.id
+
+  ingress = [
+    {
+      description = "Application"
+      from_port   = var.http_port
+      to_port     = var.http_port
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+        ipv6_cidr_blocks = []  # Optional: Add if you need to allow IPv6 addresses
+        prefix_list_ids  = []  # Optional: Add if you need to use AWS prefix lists
+        security_groups  = []  # Optional: Add if you need to allow other security groups
+        self             = false  # Optional: Set to true if you need to allow traffic from itself
+    },
+    {
+      description = "SSH"
+      from_port   = var.SSH_port
+      to_port     = var.SSH_port
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"] 
+        ipv6_cidr_blocks = []  # Optional: Add if you need to allow IPv6 addresses
+        prefix_list_ids  = []  # Optional: Add if you need to use AWS prefix lists
+        security_groups  = []  # Optional: Add if you need to allow other security groups
+        self             = false  # Optional: Set to true if you need to allow traffic from itself
+    }
+  ]
+
+  egress = [
+    { description = "allow all outbound traffic"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_blocks = ["0.0.0.0/0"]
+        ipv6_cidr_blocks = []  # Optional: Add if you need to allow IPv6 addresses
+        prefix_list_ids  = []  # Optional: Add if you need to use AWS prefix lists
+        security_groups  = []  # Optional: Add if you need to allow other security groups
+        self             = false  # Optional: Set to true if you need to allow traffic from itself
+    }
+  ]
+
+  tags = {
+    Name = "Application SG"
+  }
+}
+
+
+
+#  Load Balancer Security Group 
+
+
+
+
+resource "aws_security_group" "loadbalancer_sg" {
+  name        = "Loadbalancer SG"
+  description = "allow port 80"
+  vpc_id      = aws_vpc.production_vpc.id
+
+  ingress = [
+    {
+      description = "Loadbalancer"
+      from_port   = var.http_port
+      to_port     = var.http_port
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+        ipv6_cidr_blocks = []  # Optional: Add if you need to allow IPv6 addresses
+        prefix_list_ids  = []  # Optional: Add if you need to use AWS prefix lists
+        security_groups  = []  # Optional: Add if you need to allow other security groups
+        self             = false  # Optional: Set to true if you need to allow traffic from itself
+    }
+  ]
+
+  egress = [
+    { description = "allow all outbound traffic"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_blocks = ["0.0.0.0/0"]
+        ipv6_cidr_blocks = []  # Optional: Add if you need to allow IPv6 addresses
+        prefix_list_ids  = []  # Optional: Add if you need to use AWS prefix lists
+        security_groups  = []  # Optional: Add if you need to allow other security groups
+        self             = false  # Optional: Set to true if you need to allow traffic from itself
+    }
+  ]
+
+  tags = {
+    Name = "LoadBalancer SG"
+  }
+}
